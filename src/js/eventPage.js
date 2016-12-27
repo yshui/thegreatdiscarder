@@ -192,9 +192,14 @@ function isExcluded(tab, options) {
   }
 }
 
-function checkTemporaryWhiteList(tabId) {
-  var tempWhitelist = localStorage.getItem(TEMPORARY_WHITELIST).split(',');
+function getTemporaryWhitelist() {
+  var tempWhitelist = localStorage.getItem(TEMPORARY_WHITELIST);
+  return tempWhitelist ? tempWhitelist.split(',') : [];
+}
 
+function checkTemporaryWhiteList(tabId) {
+
+  var tempWhitelist = getTemporaryWhitelist();
   return tempWhitelist.some(function (element, index, array) {
     return element === String(tabId);
   });
@@ -318,7 +323,7 @@ function temporarilyWhitelistHighlightedTab() {
 
   chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
     if (tabs.length > 0) {
-      var tempWhitelist = localStorage.getItem(TEMPORARY_WHITELIST).split(',');
+      var tempWhitelist = getTemporaryWhitelist();
       tempWhitelist.push(tabs[0].id);
       localStorage.setItem(TEMPORARY_WHITELIST, tempWhitelist);
     }
@@ -328,7 +333,7 @@ function temporarilyWhitelistHighlightedTab() {
 function undoTemporarilyWhitelistHighlightedTab() {
   chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
     if (tabs.length > 0) {
-      var tempWhitelist = localStorage.getItem(TEMPORARY_WHITELIST).split(','),
+      var tempWhitelist = getTemporaryWhitelist(),
         i;
       for (i = tempWhitelist.length - 1; i >= 0; i--) {
         if (tempWhitelist[i] === String(tabs[0].id)) {
