@@ -38,7 +38,7 @@ function initialise(options) {
 
   saveEl.onclick = function () {
     saveChanges(optionEls, function () {
-      // closeSettings();
+      closeSettings();
     });
   };
   cancelEl.onclick = function () {
