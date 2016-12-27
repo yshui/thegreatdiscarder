@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+	<link rel="stylesheet" href="../css/font-awesome.min.css">
+	<link type="text/css" href="../css/popup.css" rel="stylesheet">
+	<script type="text/javascript" src="../js/popup.js"></script>
+
+</head>
+<body>
+	<div id="header">
+		<i id="statusIcon" class="fa fa-clock-o"></i>
+		<span id="statusDetail">Tab will be discarded</span>
+	</div>
+
+	<div class="group optsCurrent">
+		<div class="menuOption" id="tempWhitelist">
+			<i class="fa fa-pause"></i> <span class="optionText">Don't discard for now</span>
+		</div>
+		<div class="menuOption" id="whitelist">
+			<i class="fa fa-ban"></i> <span class="optionText">Never discard this site</span>
+		</div>
+	</div>
+
+	<div class="group optsAll">
+		<div class="menuOption" id="discardAll">
+			<i class="fa fa-stop"></i> <span class="optionText">Discard other tabs</span>
+		</div>
+		<div class="menuOption" href="#" id="reloadAll">
+			<i class="fa fa-play"></i> <span class="optionText">Reload all tabs</span>
+		</div>
+	</div>
+
+	<div class="group optsSelected" id="discardSelectedGroup">
+		<div class="menuOption" id="discardSelected">
+			<i class="fa fa-stop"></i> <span class="optionText">Discard selected tabs</span>
+		</div>
+		<div class="menuOption" href="#" id="reloadSelected">
+			<i class="fa fa-play"></i> <span class="optionText">Reload selected tabs</span>
+		</div>
+	</div>
+
+	<div class="group optsSettings">
+		<div class="menuOption" id="settingsLink">
+			<i class="fa fa-wrench"></i> <span class="optionText">Settings</span>
+		</div>
+	</div>
+</body>
+</html>

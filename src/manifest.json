@@ -1,0 +1,49 @@
+{
+  "name": "The Great Discarder",
+  "description": "Automatically discards unused tabs to free up system resources",
+  "version": "0.1.0",
+  "permissions": [
+    "tabs",
+    "storage",
+    "unlimitedStorage",
+    "contextMenus",
+    "alarms",
+    "webNavigation"
+  ],
+  "background": {
+    "scripts": ["js/db.js", "js/storage.js", "js/tabStates.js", "js/eventPage.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+  ],
+  "browser_action": {
+    "default_title": "The Great Discarder",
+    "default_icon": "img/icon19.png",
+    "default_popup": "html/popup.html"
+  },
+  "options_page": "html/options.html",
+  "icons": {
+    "16": "img/icon16.png",
+    "48": "img/icon48.png",
+    "128": "img/icon128.png"
+  },
+  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
+  "incognito": "split",
+  "manifest_version": 2,
+  "minimum_chrome_version": "54",
+
+  "commands": {
+    "3-discard-active-window": {
+      "description": "Discard all tabs in active window"
+    },
+    "4-reload-active-window": {
+      "description": "Reload all tabs in active window"
+    },
+    "5-discard-all-windows": {
+      "description": "Discard all tabs in all windows"
+    },
+    "6-reload-all-windows": {
+      "description": "Reload all tabs in all windows"
+    }
+  }
+}
