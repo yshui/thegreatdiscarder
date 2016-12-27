@@ -1,12 +1,13 @@
 # <img src="/src/img/icon48.png" align="absmiddle"> The Great Discarder
 
-"The Great Discarder" is a free and open-source Google Chrome extension for people who find that chrome is consuming too much system resource or suffer from frequent chrome crashing. Once installed and enabled, this extension will automatically *discard* tabs that have not been used for a while, freeing up memory and cpu that the tab was consuming.
+"The Great Discarder" is a clone of my other open source chrome extension "The Great Suspender". It was built to take advantage of Google's new 'tab discarding' functionality which is essentially a native implementation of tab suspension.
+This implementation is more robust and performant, both in the resources consumed by the extension, and the memory savings of the tab suspension. It is also compatible with chrome tab history syncing.
 
 If you have suggestions or problems using the extension, please [submit a bug or a feature request](https://github.com/deanoemcke/thegreatdiscarder/issues/).
 
 ### Installation
 
-1. Download the **[latest available version](https://github.com/deanoemcke/thegreatdiscarder/releases/tag/v0.1.0)** and unarchive to your preferred location (whichever suits you).
+1. Download the **[latest available version](https://github.com/deanoemcke/thegreatdiscarder/releases/tag/v0.1.1)** and unarchive to your preferred location (whichever suits you).
 2. Using **Google Chrome** browser, navigate to chrome://extensions/ and enable "Developer mode" in the upper right corner.
 3. Click on the <kbd>Load unpacked extension...</kbd> button.
 4. Browse to the src directory of the downloaded, unarchived release and confirm.
