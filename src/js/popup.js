@@ -17,11 +17,6 @@
       statusDetail = 'Tab cannot be discarded.';
       statusIconClass = 'fa fa-remove';
 
-    } else if (status === 'discarded') {
-      statusDetail = 'Tab discarded. <a href="#">Reload</a>';
-      statusIconClass = 'fa fa-pause';
-      message = 'reloadOne';
-
     } else if (status === 'whitelisted') {
       statusDetail = 'Site whitelisted. <a href="#">Remove from whitelist</a>';
       statusIconClass = 'fa fa-check';
@@ -30,11 +25,6 @@
     } else if (status === 'audible') {
       statusDetail = 'Tab is playing audio.';
       statusIconClass = 'fa fa-volume-up';
-
-    } else if (status === 'formInput') {
-      statusDetail = 'Tab is receiving form input. <a href="#">Unpause</a>';
-      statusIconClass = 'fa fa-edit';
-      message = 'undoTempWhitelist';
 
     } else if (status === 'pinned') {
       statusDetail = 'Tab has been pinned.';

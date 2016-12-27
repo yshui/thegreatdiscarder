@@ -84,14 +84,14 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     return;
   }
 
-  console.log('Tab updated: ' + tabId + '. Status: ' + changeInfo.status);
+  if (debug) { console.log('Tab updated: ' + tabId + '. Status: ' + changeInfo.status) };
 
   tabStates.getTabState(tabId, function (previousTabState) {
     chrome.alarms.get(String(tab.id), function (alarm) {
 
       if (debug) { console.log('previousTabState',previousTabState); }
 
-      if (!alarm && changeInfo.status === 'completed') {
+      if (!alarm && changeInfo.status === 'complete') {
         resetTabTimer(tab);
       }
 
@@ -555,18 +555,6 @@ function messageRequestListener(request, sender, sendResponse) {
         resetTabTimer(tab);
       }
     });
-    break;
-
-  case 'discardTab':
-    requestTabSuspension(sender.tab);
-    break;
-
-  case 'discardOne':
-    discardHighlightedTab();
-    break;
-
-  case 'reloadOne':
-    reloadHighlightedTab();
     break;
 
   case 'tempWhitelist':
