@@ -6,7 +6,7 @@ If you have suggestions or problems using the extension, please [submit a bug or
 
 ### Installation
 
-1. Download the **[latest available version](https://github.com/deanoemcke/thegreatdiscarder/releases/tag/v6.21)** and unarchive to your preferred location (whichever suits you).
+1. Download the **[latest available version](https://github.com/deanoemcke/thegreatdiscarder/releases/tag/v0.1.0)** and unarchive to your preferred location (whichever suits you).
 2. Using **Google Chrome** browser, navigate to chrome://extensions/ and enable "Developer mode" in the upper right corner.
 3. Click on the <kbd>Load unpacked extension...</kbd> button.
 4. Browse to the src directory of the downloaded, unarchived release and confirm.
@@ -19,6 +19,5 @@ This work is licensed under a GNU GENERAL PUBLIC LICENSE (v2)
 
 ### Shoutouts
 
-This package uses the [html2canvas] (https://github.com/niklasvh/html2canvas) library written by Niklas von Hertzen.
-It also uses the indexedDb wrapper [db.js] (https://github.com/aaronpowell/db.js) written by Aaron Powell.
+This package uses the indexedDb wrapper [db.js] (https://github.com/aaronpowell/db.js) written by Aaron Powell.
 Thank you also to www.browserstack.com for providing free chrome testing tools.
