@@ -80,6 +80,14 @@
     }
   }
 
+  function setDiscardOneVisibility(visible) {
+      if (visible) {
+          document.getElementById('discardOne').style.display = 'block';
+      } else {
+          document.getElementById('discardOne').style.display = 'none';
+      }
+  }
+
   function setDiscardSelectedVisibility() {
     chrome.tabs.query({highlighted: true, lastFocusedWindow: true}, function (tabs) {
       if (tabs && tabs.length > 1) {
@@ -91,6 +99,10 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('discardOne').addEventListener('click', function (e) {
+        chrome.runtime.sendMessage({ action: 'discardOne' });
+        window.close();
+    });
     document.getElementById('discardAll').addEventListener('click', function (e) {
       chrome.runtime.sendMessage({ action: 'discardAll' });
       window.close();
@@ -128,10 +140,12 @@
 
       var status = info.status,
         //timeLeft = info.timerUp, // unused
+        discardOneVisible = (status === 'discarded' || status === 'special' || status === 'unknown') ? false : true,
         whitelistVisible = (status !== 'whitelisted' && status !== 'special') ? true : false,
         pauseVisible = (status === 'normal') ? true : false;
 
       setDiscardSelectedVisibility();
+      setDiscardOneVisibility(discardOneVisible);
       setWhitelistVisibility(whitelistVisible);
       setPauseVisibility(pauseVisible);
       setStatus(status);

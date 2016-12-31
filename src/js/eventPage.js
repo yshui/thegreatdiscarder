@@ -9,12 +9,13 @@
 
 'use strict';
 
-const LAST_TAB_ID = 'lastTabId';
+const CURRENT_TAB_ID = 'currentTabId';
+const PREVIOUS_TAB_ID = 'previousTabId';
 const TEMPORARY_WHITELIST = 'temporaryWhitelist';
 
 const suspensionActiveIcon = '/img/icon19.png';
 const suspensionPausedIcon = '/img/icon19b.png';
-const debug = false;
+const debug = true;
 
 
 //initialise global state vars
@@ -45,7 +46,7 @@ chrome.runtime.onStartup.addListener(function () {
     tabStates.clearTabStates(function () {
       chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
         if (tabs.length > 0) {
-          localStorage.setItem(LAST_TAB_ID, tabs[0].id);
+          localStorage.setItem(CURRENT_TAB_ID, tabs[0].id);
         }
       });
     });
@@ -83,8 +84,11 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
   if (changeInfo.status === 'loading') {
     return;
   }
+  else if (isDiscarded(tab)) {
+    return;
+  }
 
-  if (debug) { console.log('Tab updated: ' + tabId + '. Status: ' + changeInfo.status) };
+  if (debug) { console.log('Tab updated: ' + tabId + '. Status: ' + changeInfo.status); }
 
   tabStates.getTabState(tabId, function (previousTabState) {
     chrome.alarms.get(String(tab.id), function (alarm) {
@@ -123,7 +127,7 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
   console.log(activeInfo);
   var tabId = activeInfo.tabId;
   var windowId = activeInfo.windowId;
-  var lastTabId = localStorage.getItem(LAST_TAB_ID);
+  var lastTabId = localStorage.getItem(CURRENT_TAB_ID);
 
   if (debug) {
     console.log('tab changed: ' + tabId);
@@ -143,7 +147,8 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
       }
     });
   }
-  localStorage.setItem(LAST_TAB_ID, tabId);
+  localStorage.setItem(CURRENT_TAB_ID, tabId);
+  localStorage.setItem(PREVIOUS_TAB_ID, lastTabId);
 });
 
 
@@ -251,7 +256,7 @@ function requestTabSuspension(tab, force) {
 
   //if forcing tab discard then skip other checks
   if (force) {
-    discardTab(tab.id);
+    discardTab(tab);
 
   //otherwise perform soft checks before discarding
   } else {
@@ -261,7 +266,7 @@ function requestTabSuspension(tab, force) {
       if (!isExcluded(tab, options) &&
           !(options[storage.ONLINE_CHECK] && !navigator.onLine) &&
           !(options[storage.BATTERY_CHECK] && chargingMode)) {
-        discardTab(tab.id);
+        discardTab(tab);
       }
     });
   }
@@ -272,23 +277,30 @@ function clearTabTimer(tabId) {
 }
 
 function resetTabTimer(tab) {
-  if (!isDiscarded(tab) && !tab.active) {
-    console.log('Resetting timer for tab: ' + tab.id);
-    storage.getOption(storage.SUSPEND_TIME, function (suspendTime) {
+
+  storage.getOption(storage.SUSPEND_TIME, function (suspendTime) {
+
+    if (suspendTime === '0') {
+      if (debug) { console.log('Clearning timer for tab: ' + tab.id); }
+      clearTabTimer(tab.id);
+    }
+    else if (!isDiscarded(tab) && !tab.active && !isSpecialTab(tab)) {
+      if (debug) { console.log('Resetting timer for tab: ' + tab.id); }
       var dateToSuspend = parseInt(Date.now() + (parseFloat(suspendTime) * 1000 * 60));
       chrome.alarms.create(String(tab.id), {when:  dateToSuspend});
-    });
-  }
+    }
+    else {
+      if (debug) { console.log("Skipping tab tiemr reset: ",tab); }
+    }
+  });
 }
 
-function discardTab(tabId) {
-  chrome.tabs.discard(tabId, function (tab) {
+function discardTab(tab) {
+
+  chrome.tabs.discard(tab.id, function (discardedTab) {
 
     if (chrome.runtime.lastError) {
       console.log(chrome.runtime.lastError.message);
-    }
-    else {
-      console.log('discarded tab', tab);
     }
   });
 }
@@ -348,7 +360,18 @@ function undoTemporarilyWhitelistHighlightedTab() {
 function discardHighlightedTab() {
   chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
     if (tabs.length > 0) {
-      discardTab(tabs[0].id, true);
+      var tabToDiscard = tabs[0];
+      var previousTabId = localStorage.getItem(PREVIOUS_TAB_ID);
+      if (previousTabId) {
+        chrome.tabs.update(parseInt(previousTabId), { active: true, highlighted: true }, function (tab) {
+          discardTab(tabToDiscard, true);
+        });
+      }
+      else {
+        chrome.tabs.create({}, function (tab) {
+          discardTab(tabToDiscard, true);
+        });
+      }
     }
   });
 }
@@ -390,6 +413,9 @@ function reloadAllTabs() {
       curWindow.tabs.forEach(function (currentTab) {
         if (isDiscarded(currentTab)) {
           reloadTab(currentTab);
+        }
+        else {
+          resetTabTimer(currentTab);
         }
       });
     });
@@ -448,7 +474,7 @@ function requestTabInfo(tab, callback) {
       tabId: '',
       status: 'unknown',
       timerUp: '-'
-    };
+  };
 
   chrome.alarms.get(String(tab.id), function (alarm) {
 
@@ -467,7 +493,13 @@ function requestTabInfo(tab, callback) {
     //check if it has already been discarded
     } else if (isDiscarded(tab)) {
       info.status = 'discarded';
-      callback(info);
+      tabStates.getTabState(tab.id, function (tab) {
+        if (tab) {
+          info.availableCapacityBefore = tab.availableCapacityBefore;
+          info.availableCapacityAfter = tab.availableCapacityAfter;
+        }
+        callback(info);
+      });
 
     } else {
       processActiveTabStatus(tab, function (status) {
@@ -556,6 +588,10 @@ function messageRequestListener(request, sender, sendResponse) {
       }
     });
     break;
+
+  case 'discardOne':
+      discardHighlightedTab();
+      break;
 
   case 'tempWhitelist':
     temporarilyWhitelistHighlightedTab();
